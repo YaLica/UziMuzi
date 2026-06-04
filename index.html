@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Соображарий</title>
+    <title>УЗИ-МУЗИ</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         html, body {
@@ -93,20 +93,23 @@
 <body>
 
     <div class="swiper-container" id="swiper">
+        <!-- Экран 1: Продающая обложка -->
         <div class="page" id="page1">
             <div class="hint-badge">Листай влево ➔</div>
-            <img src="https://files.catbox.moe/7km2sn.jpeg" alt="Обложка">
+            <img src="https://files.catbox.moe/p5kwm6.png" alt="Обложка УЗИ-МУЗИ">
         </div>
 
+        <!-- Экран 2: Правила игры -->
         <div class="page" id="page2">
             <div class="hint-badge">Листай влево ➔</div>
-            <img src="https://files.catbox.moe/usz2s1.jpeg" alt="Правила">
+            <img src="https://files.catbox.moe/jz3zjh.png" alt="Правила игры">
         </div>
 
+        <!-- Экран 3: Видео-игра -->
         <div class="page" id="page3">
             <div class="play-pause-badge">🔘 Старт / Стоп</div>
             <video id="gameVideo" loop playsinline preload="auto">
-                <source src="https://files.catbox.moe/hhikc3.mp4" type="video/mp4">
+                <source src="https://files.catbox.moe/syu8dl.mp4" type="video/mp4">
             </video>
         </div>
     </div>
@@ -115,7 +118,7 @@
         // Инициализируем Telegram WebApp
         const tg = window.Telegram.WebApp;
 
-        // ПРОВЕРКА БЕЗОПАСНОСТИ: Если открыто не в Телеграме (initData пустая), блокируем страницу
+        // ПРОВЕРКА БЕЗОПАСНОСТИ: Если открыто не в Телеграме, блокируем страницу
         if (!tg || !tg.initData || tg.initData === "") {
             document.body.innerHTML = `
                 <div style="
@@ -133,9 +136,9 @@
                 ">
                     <h2 style="color: #ffd700; font-size: 26px; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px;">🤖 Доступ ограничен</h2>
                     <p style="font-size: 16px; line-height: 1.6; max-width: 360px; margin-bottom: 35px; color: #a4b0be;">
-                        Интерактивная игра «Соображарий» защищена от копирования и доступна только через наш официальный Telegram-бот.
+                        Интерактивная игра «УЗИ-МУЗИ» защищена от копирования и доступна только через наш официальный Telegram-бот.
                     </p>
-                    <a href="https://t.me/SoobrazhariyGameBot" style="
+                    <a href="https://t.me/UziMuziGameBot" style="
                         display: inline-block; 
                         padding: 16px 32px; 
                         background: linear-gradient(135deg, #ffd700, #ffa500); 
@@ -150,16 +153,15 @@
                     ">Перейти в игру</a>
                 </div>
             `;
-            // Останавливаем выполнение дальнейшего скрипта игры
             throw new Error("Доступ заблокирован фейсконтролем.");
         }
 
-        // Если проверку прошли, разворачиваем WebApp на весь экран для красоты
+        // Разворачиваем WebApp на весь экран
         if (typeof tg.expand === 'function') {
             tg.expand();
         }
 
-        // ОСНОВНАЯ ЛОГИКА ТВОЕЙ ИГРЫ
+        // ОСНОВНАЯ ЛОГИКА ИГРЫ
         const swiper = document.getElementById('swiper');
         const video = document.getElementById('gameVideo');
         let currentPage = 0;
@@ -169,6 +171,7 @@
             currentPage = pageIndex;
             swiper.style.transform = `translateX(-${currentPage * 33.3333}%)`;
             
+            // Видео автоматически запускается только на третьем экране (индекс 2)
             if (currentPage === 2) {
                 video.play().catch(() => {});
             } else {
@@ -192,7 +195,7 @@
             if (diffX < -60 && currentPage > 0) changePage(currentPage - 1);
         });
 
-        // Управление стрелочками и пробелом с клавиатуры
+        // Управление клавиатурой
         document.addEventListener('keydown', (e) => {
             if (e.key === 'ArrowRight' || e.key === ' ') {
                 if (currentPage < 2) changePage(currentPage + 1);
@@ -202,7 +205,7 @@
             }
         });
 
-        // Старт/Пауза видео от тапа в любом месте третьего экрана
+        // Старт/Пауза видео от тапа по экрану с видео
         video.addEventListener('click', (e) => {
             e.stopPropagation();
             if (video.paused) {
