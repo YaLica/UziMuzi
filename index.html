@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -59,10 +61,8 @@
             text-transform: uppercase;
             letter-spacing: 1px;
             border: 1px solid rgba(255, 255, 255, 0.4);
-            pointer-events: none; /* Чтобы не мешала тапам */
+            pointer-events: none;
             z-index: 5;
-            
-            /* Мягкая пульсация */
             animation: pulseBlink 2s infinite ease-in-out;
         }
 
@@ -77,7 +77,7 @@
             position: absolute;
             bottom: 30px;
             right: 20px;
-            background: rgba(255, 215, 0, 0.9); /* Золотисто-жёлтая */
+            background: rgba(255, 215, 0, 0.9);
             color: #000000;
             padding: 10px 16px;
             border-radius: 30px;
@@ -109,7 +109,7 @@
         <div class="page" id="page3">
             <div class="play-pause-badge">🔘 Старт / Стоп</div>
             <video id="gameVideo" loop playsinline preload="auto">
-                <source src="https://files.catbox.moe/syu8dl.mp4" type="video/mp4">
+                <source id="videoSource" src="https://files.catbox.moe/syu8dl.mp4" type="video/mp4">
             </video>
         </div>
     </div>
@@ -118,60 +118,44 @@
         // Инициализируем Telegram WebApp
         const tg = window.Telegram.WebApp;
 
-        // ПРОВЕРКА БЕЗОПАСНОСТИ: Если открыто не в Телеграме, блокируем страницу
+        // ПРОВЕРКА БЕЗОПАСНОСТИ
         if (!tg || !tg.initData || tg.initData === "") {
             document.body.innerHTML = `
-                <div style="
-                    display: flex; 
-                    flex-direction: column; 
-                    align-items: center; 
-                    justify-content: center; 
-                    height: 100vh; 
-                    background-color: #000000; 
-                    color: #ffffff; 
-                    font-family: 'Segoe UI', Roboto, sans-serif; 
-                    text-align: center; 
-                    padding: 30px;
-                    box-sizing: border-box;
-                ">
+                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background-color: #000000; color: #ffffff; font-family: 'Segoe UI', Roboto, sans-serif; text-align: center; padding: 30px; box-sizing: border-box;">
                     <h2 style="color: #ffd700; font-size: 26px; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px;">🤖 Доступ ограничен</h2>
                     <p style="font-size: 16px; line-height: 1.6; max-width: 360px; margin-bottom: 35px; color: #a4b0be;">
                         Интерактивная игра «УЗИ-МУЗИ» защищена от копирования и доступна только через наш официальный Telegram-бот.
                     </p>
-                    <a href="https://t.me/SoobrazhariyGameBot" style="
-                        display: inline-block; 
-                        padding: 16px 32px; 
-                        background: linear-gradient(135deg, #ffd700, #ffa500); 
-                        color: #000000; 
-                        text-decoration: none; 
-                        font-size: 16px; 
-                        font-weight: bold; 
-                        border-radius: 30px;
-                        text-transform: uppercase;
-                        box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
-                        letter-spacing: 0.5px;
-                    ">Перейти в игру</a>
+                    <a href="https://t.me/SoobrazhariyGameBot" style="display: inline-block; padding: 16px 32px; background: linear-gradient(135deg, #ffd700, #ffa500); color: #000000; text-decoration: none; font-size: 16px; font-weight: bold; border-radius: 30px; text-transform: uppercase; box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3); letter-spacing: 0.5px;">Перейти в игру</a>
                 </div>
             `;
             throw new Error("Доступ заблокирован фейсконтролем.");
         }
 
-        // Разворачиваем WebApp на весь экран
         if (typeof tg.expand === 'function') {
             tg.expand();
         }
 
+        // ОПРЕДЕЛЕНИЕ ВЫПУСКА ИГРЫ (DEEP LINKING)
+        const video = document.getElementById('gameVideo');
+        const startParam = tg.initDataUnsafe.start_param;
+
+        // Переключаем видео в зависимости от параметра в ссылке
+        if (startParam === 'game2') {
+            video.src = "https://files.catbox.moe/tpj2w8.mp4";
+        } else {
+            video.src = "https://files.catbox.moe/syu8dl.mp4";
+        }
+        video.load(); // Перезагружаем плеер под новое видео
+
         // ОСНОВНАЯ ЛОГИКА ИГРЫ
         const swiper = document.getElementById('swiper');
-        const video = document.getElementById('gameVideo');
         let currentPage = 0;
 
-        // Логика переключения экранов
         function changePage(pageIndex) {
             currentPage = pageIndex;
             swiper.style.transform = `translateX(-${currentPage * 33.3333}%)`;
             
-            // Видео автоматически запускается только на третьем экране (индекс 2)
             if (currentPage === 2) {
                 video.play().catch(() => {});
             } else {
@@ -179,11 +163,9 @@
             }
         }
 
-        // Управление кликами мышкой (для компьютера)
         document.getElementById('page1').addEventListener('click', () => changePage(1));
         document.getElementById('page2').addEventListener('click', () => changePage(2));
 
-        // Управление свайпами (для смартфонов)
         let startX = 0;
         document.addEventListener('touchstart', (e) => {
             startX = e.touches[0].clientX;
@@ -195,7 +177,6 @@
             if (diffX < -60 && currentPage > 0) changePage(currentPage - 1);
         });
 
-        // Управление клавиатурой
         document.addEventListener('keydown', (e) => {
             if (e.key === 'ArrowRight' || e.key === ' ') {
                 if (currentPage < 2) changePage(currentPage + 1);
@@ -205,7 +186,6 @@
             }
         });
 
-        // Старт/Пауза видео от тапа по экрану с видео
         video.addEventListener('click', (e) => {
             e.stopPropagation();
             if (video.paused) {
