@@ -1,12 +1,9 @@
-
-
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>УЗИ-МУЗИ</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <title>УЗИ-МУЗИ — Выпуск 1</title>
     <style>
         html, body {
             margin: 0;
@@ -109,49 +106,17 @@
         <div class="page" id="page3">
             <div class="play-pause-badge">🔘 Старт / Стоп</div>
             <video id="gameVideo" loop playsinline preload="auto">
-                <source id="videoSource" src="https://files.catbox.moe/syu8dl.mp4" type="video/mp4">
+                <source src="https://files.catbox.moe/syu8dl.mp4" type="video/mp4">
             </video>
         </div>
     </div>
 
     <script>
-        // Инициализируем Telegram WebApp
-        const tg = window.Telegram.WebApp;
-
-        // ПРОВЕРКА БЕЗОПАСНОСТИ
-        if (!tg || !tg.initData || tg.initData === "") {
-            document.body.innerHTML = `
-                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background-color: #000000; color: #ffffff; font-family: 'Segoe UI', Roboto, sans-serif; text-align: center; padding: 30px; box-sizing: border-box;">
-                    <h2 style="color: #ffd700; font-size: 26px; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px;">🤖 Доступ ограничен</h2>
-                    <p style="font-size: 16px; line-height: 1.6; max-width: 360px; margin-bottom: 35px; color: #a4b0be;">
-                        Интерактивная игра «УЗИ-МУЗИ» защищена от копирования и доступна только через наш официальный Telegram-бот.
-                    </p>
-                    <a href="https://t.me/SoobrazhariyGameBot" style="display: inline-block; padding: 16px 32px; background: linear-gradient(135deg, #ffd700, #ffa500); color: #000000; text-decoration: none; font-size: 16px; font-weight: bold; border-radius: 30px; text-transform: uppercase; box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3); letter-spacing: 0.5px;">Перейти в игру</a>
-                </div>
-            `;
-            throw new Error("Доступ заблокирован фейсконтролем.");
-        }
-
-        if (typeof tg.expand === 'function') {
-            tg.expand();
-        }
-
-        // ОПРЕДЕЛЕНИЕ ВЫПУСКА ИГРЫ (DEEP LINKING)
         const video = document.getElementById('gameVideo');
-        const startParam = tg.initDataUnsafe.start_param;
-
-        // Переключаем видео в зависимости от параметра в ссылке
-        if (startParam === 'game2') {
-            video.src = "https://files.catbox.moe/tpj2w8.mp4";
-        } else {
-            video.src = "https://files.catbox.moe/syu8dl.mp4";
-        }
-        video.load(); // Перезагружаем плеер под новое видео
-
-        // ОСНОВНАЯ ЛОГИКА ИГРЫ
         const swiper = document.getElementById('swiper');
         let currentPage = 0;
 
+        /* ОСНОВНАЯ ЛОГИКА ИГРЫ (ЛИСТАНИЕ) */
         function changePage(pageIndex) {
             currentPage = pageIndex;
             swiper.style.transform = `translateX(-${currentPage * 33.3333}%)`;
